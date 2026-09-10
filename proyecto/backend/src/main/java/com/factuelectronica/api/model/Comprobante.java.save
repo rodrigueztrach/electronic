@@ -1,0 +1,141 @@
+package com.factuelectronica.api.model;
+
+import jakarta.persistence.*;
+import lombok.*;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
+
+import java.math.BigDecimal;
+import java.time.OffsetDateTime;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
+
+/**
+ * NOTA: en el esquema PostgreSQL (ver database/schema.sql) la tabla "comprobante"
+ * está particionada por rango de fecha_emision y su llave primaria real es compuesta
+ * (id, fecha_emision), requisito de PostgreSQL para tablas particionadas.
+ * Para simplificar el modelo de dominio, esta entidad JPA expone únicamente "id"
+ * como identificador de negocio. Si se requiere reflejar la clave compuesta en el
+ * ORM, sustituir por @IdClass o @EmbeddedId.
+ */
+@Entity
+@Table(name = "comprobante")
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
+public class Comprobante {
+
+    @Id
+    @GeneratedValue
+    private UUID id;
+
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "emisor_id", nullable = false)
+    private Emisor emisor;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "receptor_id")
+    private Receptor receptor;
+
+    @Column(name = "tipo_documento", nullable = false, length = 2)
+    private TipoDocumento tipoDocumento;
+
+    @Column(name = "clave_numerica", nullable = false, unique = true, length = 50)
+    private String claveNumerica;
+
+    @Column(name = "consecutivo", nullable = false, unique = true, length = 20)
+    private String consecutivo;
+
+    @Column(name = "sucursal", nullable = false, length = 3)
+    @Builder.Default
+    private String sucursal = "001";
+
+    @Column(name = "terminal", nullable = false, length = 5)
+    @Builder.Default
+    private String terminal = "00001";
+
+    @Column(name = "fecha_emision", nullable = false)
+    private OffsetDateTime fechaEmision;
+
+    @Column(name = "moneda", nullable = false, length = 3)
+    @Builder.Default
+    private String moneda = "CRC";
+
+    @Column(name = "tipo_cambio", precision = 18, scale = 5)
+    private BigDecimal tipoCambio;
+
+    @Column(name = "condicion_venta", nullable = false, length = 2)
+    @Builder.Default
+    private String condicionVenta = "01";
+
+    @Column(name = "plazo_credito", length = 10)
+    private String plazoCredito;
+
+    @Column(name = "total_gravado", nullable = false, precision = 18, scale = 5)
+    @Builder.Default
+    private BigDecimal totalGravado = BigDecimal.ZERO;
+
+    @Column(name = "total_exento", nullable = false, precision = 18, scale = 5)
+    @Builder.Default
+    private BigDecimal totalExento = BigDecimal.ZERO;
+
+    @Column(name = "total_exonerado", nullable = false, precision = 18, scale = 5)
+    @Builder.Default
+    private BigDecimal totalExonerado = BigDecimal.ZERO;
+
+    @Column(name = "total_impuesto", nullable = false, precision = 18, scale = 5)
+    @Builder.Default
+    private BigDecimal totalImpuesto = BigDecimal.ZERO;
+
+    @Column(name = "total_descuento", nullable = false, precision = 18, scale = 5)
+    @Builder.Default
+    private BigDecimal totalDescuento = BigDecimal.ZERO;
+
+        @Column(name = "xml_firmado", columnDefinition = "TEXT")
+    private String xmlFirmado;@Column(name = "total_comprobante", nullable = false, precision = 18, scale = 5)
+    @Builder.Default
+    private BigDecimal totalComprobante = BigDecimal.ZERO;
+
+    @Column(name = "estado", nullable = false, length = 20)
+    @Builder.Default
+    private EstadoComprobante estado = EstadoComprobante.CREADO;
+
+    @Column(name = "version_esquema", nullable = false, length = 5)
+    @Builder.Default
+    private String versionEsquema = "4.4";
+
+    @Column(name = "proveedor_sistemas", length = 20)
+    private String proveedorSistemas;
+
+    
+
+    @Column(name = "xml_hash", length = 128)
+    private String xmlHash;
+
+    @Column(name = "motivo_error", length = 500)
+    private String motivoError;
+
+    @OneToMany(mappedBy = "comprobante", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
+    private List<ComprobanteDetalle> detalle = new ArrayList<>();
+
+    @OneToMany(mappedBy = "comprobante", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
+    private List<MensajeHacienda> mensajesHacienda = new ArrayList<>();
+
+    @CreationTimestamp
+    @Column(name = "creado_en", updatable = false)
+    private OffsetDateTime creadoEn;
+
+    @UpdateTimestamp
+    @Column(name = "actualizado_en")
+    private OffsetDateTime actualizadoEn;
+
+    public void agregarDetalle(ComprobanteDetalle linea) {
+        linea.setComprobante(this);
+        this.detalle.add(linea);
+    }
+}
