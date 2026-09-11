@@ -1,0 +1,144 @@
+:root {
+  --color-primary: #1f4e5f;
+  --color-accent: #2e86ab;
+  --color-bg: #f7f9fa;
+  --color-border: #dde3e6;
+  font-family: "Segoe UI", system-ui, sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background: var(--color-bg);
+  color: #1a1a1a;
+}
+
+.app-shell {
+  display: flex;
+  min-height: 100vh;
+}
+
+.sidebar {
+  width: 220px;
+  background: var(--color-primary);
+  color: white;
+  padding: 24px 16px;
+}
+
+.sidebar h1 {
+  font-size: 16px;
+  margin-bottom: 24px;
+}
+
+.sidebar nav a {
+  display: block;
+  color: white;
+  text-decoration: none;
+  padding: 10px 8px;
+  border-radius: 6px;
+  margin-bottom: 4px;
+  font-size: 14px;
+}
+
+.sidebar nav a.active,
+.sidebar nav a:hover {
+  background: rgba(255, 255, 255, 0.15);
+}
+
+.content {
+  flex: 1;
+  padding: 32px;
+  max-width: 1100px;
+}
+
+.card {
+  background: white;
+  border: 1px solid var(--color-border);
+  border-radius: 10px;
+  padding: 20px;
+  margin-bottom: 20px;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+th, td {
+  text-align: left;
+  padding: 10px 8px;
+  border-bottom: 1px solid var(--color-border);
+  font-size: 14px;
+}
+
+th {
+  background: #eaf1f3;
+  color: var(--color-primary);
+}
+
+.badge {
+  padding: 3px 10px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.badge.aceptado { background: #dcf5e2; color: #1c7a35; }
+.badge.rechazado, .badge.error_envio { background: #fbe0e0; color: #a12626; }
+.badge.enviado, .badge.firmado, .badge.validado { background: #fff3d6; color: #8a6300; }
+.badge.creado, .badge.anulado { background: #e6e6e6; color: #555; }
+
+button, .btn {
+  background: var(--color-accent);
+  color: white;
+  border: none;
+  border-radius: 6px;
+  padding: 8px 16px;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+button:hover { opacity: 0.9; }
+
+input, select, textarea {
+  padding: 8px;
+  border: 1px solid var(--color-border);
+  border-radius: 6px;
+  font-size: 14px;
+  width: 100%;
+}
+
+label {
+  display: block;
+  font-size: 13px;
+  font-weight: 600;
+  margin-bottom: 4px;
+  color: #444;
+}
+
+.form-row {
+  margin-bottom: 14px;
+}
+
+.form-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 14px;
+}
+
+.linea-detalle {
+  border: 1px dashed var(--color-border);
+  border-radius: 8px;
+  padding: 12px;
+  margin-bottom: 10px;
+}
+
+.error-text {
+  color: #a12626;
+  font-size: 12px;
+  margin-top: 4px;
+}

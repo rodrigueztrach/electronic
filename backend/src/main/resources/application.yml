@@ -1,0 +1,78 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: facturacion-electronica-api
+
+  datasource:
+    url: jdbc:postgresql://localhost:5432/facturacion_electronica
+    username: ${DB_USER:fe_app}
+    password: ${DB_PASSWORD:changeme}
+    driver-class-name: org.postgresql.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: validate      # el esquema lo gestiona Flyway, no Hibernate
+    open-in-view: false
+    properties:
+      hibernate:
+        format_sql: true
+        jdbc:
+          time_zone: America/Costa_Rica
+
+  flyway:
+    enabled: true
+    locations: classpath:db/migration
+    baseline-on-migrate: true
+
+  data:
+    redis:
+      host: ${REDIS_HOST:localhost}
+      port: ${REDIS_PORT:6379}
+
+  # NOTA: la validación de JWT ya NO usa un issuer-uri externo (Keycloak, etc.).
+  # El backend firma y valida sus propios tokens con la clave simétrica
+  # definida más abajo en `facturacion.seguridad.jwt-secret` (ver SecurityConfig
+  # y JwtService). Si en el futuro se integra un proveedor de identidad externo,
+  # se reactiva este bloque y se elimina el bean JwtDecoder manual.
+  # security:
+  #   oauth2:
+  #     resourceserver:
+  #       jwt:
+  #         issuer-uri: ${AUTH_ISSUER_URI:http://localhost:8081/realms/facturacion}
+
+springdoc:
+  api-docs:
+    path: /api/v1/openapi
+  swagger-ui:
+    path: /api/v1/docs
+
+# Configuración propia del dominio de Facturación Electrónica
+facturacion:
+  hacienda:
+    ambientes:
+      sandbox:
+        auth-url: https://idp.comprobanteselectronicos.go.cr/auth/realms/rut-stag/protocol/openid-connect/token
+        api-url: https://api.comprobanteselectronicos.go.cr/recepcion-sandbox/v1
+        client-id: api-stag
+      produccion:
+        auth-url: https://idp.comprobanteselectronicos.go.cr/auth/realms/rut/protocol/openid-connect/token
+        api-url: https://api.comprobanteselectronicos.go.cr/recepcion/v1
+        client-id: api-prod
+    reintentos:
+      max-intentos: 5
+      backoff-base-segundos: 60
+  seguridad:
+    clave-cifrado-certificados: ${FE_CLAVE_CIFRADO:CAMBIAR-EN-PRODUCCION-32BYTES!!}
+    # Clave simétrica (HS256) para firmar/validar los JWT propios del login.
+    # Debe tener al menos 32 caracteres. CAMBIAR en producción por un valor
+    # aleatorio y guardarlo como secreto (variable de entorno FE_JWT_SECRET),
+    # nunca en el control de versiones.
+    jwt-secret: ${FE_JWT_SECRET:cambiar-este-secreto-de-desarrollo-32b}
+    jwt-expiracion-minutos: ${FE_JWT_EXPIRACION_MIN:60}
+
+logging:
+  level:
+    root: INFO
+    com.factuelectronica: DEBUG
