@@ -28,8 +28,7 @@ Requisitos: JDK 21, Maven 3.9+, PostgreSQL 15+, Redis (opcional en desarrollo).
 
 ```bash
 cd backend
-export DB_USER=fe_app
-export DB_PASSWORD=changeme
+
 mvn spring-boot:run
 ```
 
