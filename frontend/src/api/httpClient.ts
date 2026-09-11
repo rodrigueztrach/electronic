@@ -24,6 +24,13 @@ httpClient.interceptors.request.use((config) => {
 httpClient.interceptors.response.use(
   (response) => response,
   (error) => {
+    if (error.response?.status === 401) {
+      window.localStorage.removeItem("fe_access_token");
+      window.localStorage.removeItem("fe_usuario");
+      if (window.location.pathname !== "/login") {
+        window.location.href = "/login";
+      }
+    }
     const mensaje =
       error.response?.data?.message ??
       error.message ??
